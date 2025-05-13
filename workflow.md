@@ -32,6 +32,124 @@ Now, we will use hifiasm to change the HiFi reads into an assembly.
 
 This code is adapted from a [workflow](https://github.com/kaede0e/stinging_nettle_genome_assembly/blob/main/1_genome_assembly_with_PBHiFi_HiC/how_to_run_this_assembly_workflow.md) on genome assembly by Kaede H. 
 
+If it is taking a long time to find a node, use 32 cpus instead of 48. Make sure to change it in both the SBATCH comment and in the hifiasm command.
+
+```
+#!/bin/bash
+#SBATCH --time=5-00:00:00
+#SBATCH --mem=192000M
+#SBATCH --account=
+#SBATCH --cpus-per-task=48
+#SBATCH --output=hifiasm.out
+#SBATCH --error=hifiasm.err
+
+### Draft genome assembly with HiFiasm + Hi-C data ###
+
+#####################################
+### Execution of programs ###########
+#####################################
+
+# ---------------------------------------------------------------------
+echo "Current working directory: `pwd`"
+echo "Starting run at: `date`"
+echo "SLURM_JOBID: " $SLURM_JOBID
+# ---------------------------------------------------------------------
+echo ""
+
+# module load StdEnv/2020
+module load hifiasm/0.19.5
+
+#####################################
+##### Variables / data ##############
+#####################################
+
+HiC_1=/project/def-mtodesco/vschimma/thimbleberry/raw-data/
+HiC_2=/project/def-mtodesco/vschimma/thimbleberry/raw-data/
+Hifi_fastq=/project/def-mtodesco/vschimma/thimbleberry/raw-data/
+
+hifiasm -o thimbleberry.asm -t 48 --h1 $HiC_1 --h2 $HiC_2 $Hifi_fastq -s 0.4 --hom-cov 128
+
+# ---------------------------------------------------------------------
+echo "Done assembly with Hifiasm. Use 3D-DNA to scaffold contigs further."
+# ---------------------------------------------------------------------
+
+echo "Finished job at `date`"
 ```
 
+## Prepare files for Juicer
+
+# Use BWA to create references
+
+First, convert the .gfa file of haploid 1 from the hifiasm output into a fasta file with awk (as per the [hifiasm FAQ](https://hifiasm.readthedocs.io/en/latest/faq.html)):
+
+```
+awk '/^S/{print ">"$2;print $3}' test.p_ctg.gfa > test.p_ctg.fa
+```
+
+Next, create a directory called /references and cd into it. Then, use BWA to index by running this job:
+
+```
+#!/bin/bash
+#SBATCH --time=1:00:00
+#SBATCH --mem=30Gb
+#SBATCH --account=
+
+module load
+module load bwa
+
+bwa index *.fa
+```
+
+# Git clone juicer
+
+Cd into wherever you store packages, make a juicer directory, and git clone juicer:
+
+```
+cd /home/vschimma/packages/
+mkdir juicer/
+cd juicer/
+git clone https://github.com/aidenlab/juicer.git
+```
+
+# Generating site positions
+
+Return back to the project directory. Create a new directory called /restriction-sites and cd into it. Then, copy
+
+Then, copy generate_site_positions.py ([path-to-packages]/juicer/misc/generate_site_positions.py) into /restriction-sites. Modify it by adding a new entry in filenames:
+
+```
+  filenames = {
+    'hg19': '/seq/references/Homo_sapiens_assembly19.fasta',
+    'mm9' : '/seq/references/Mus_musculus_assembly9.fasta',
+    'mm10': '/seq/references/Mus_musculus_assembly10.fasta',
+    'hg18': '/seq/references/Homo_sapiens_assembly18.fasta',
+    'rp_hap1_ctg': '../references/thimbleberry.asm.hic.hap1.p_ctg.fa', #MODIFY HERE: put your contig/assembly and its path
+  }
+```
+
+ Then, run the following job:
+
+```
+#!/bin/bash
+#SBATCH --time=1:00:00
+#SBATCH --mem=30Gb
+#SBATCH --account=
+
+module load python
+
+python generate_site_positions.py DpnII rp_hap1_ctg # use the name you made in generate_site_positions.py, not the file path
+```
+
+# Get the chromosome sizes
+
+```
+#!/bin/bash
+#SBATCH --time=1:00:00
+#SBATCH --mem=30Gb
+#SBATCH --account=
+
+for i in $(ls *DpnII.txt); do
+  name=$(echo $i | cut -d "." -f 1 )
+  awk 'BEGIN{OFS="\t"}{print $1, $NF}'  $i > "$name"".chrom.sizes"
+done
 ```
