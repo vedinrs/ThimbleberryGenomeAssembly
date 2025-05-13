@@ -22,7 +22,7 @@ Use FastQC to verify high quality reads. Create a new directory and cd into it t
 ```
 module load fastqc
 
-fastqc [path-to-dir]/raw-data/*.fastq
+fastqc --outdir [path-to-dir]/fastqc-out [path-to-dir]/raw-data/*.fastq
 ```
 
 
