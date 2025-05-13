@@ -65,7 +65,7 @@ echo "SLURM_JOBID: " $SLURM_JOBID
 # ---------------------------------------------------------------------
 echo ""
 
-# module load StdEnv/2020
+module load StdEnv/2020
 module load hifiasm/0.19.5
 
 #####################################
@@ -85,17 +85,19 @@ echo "Done assembly with Hifiasm. Use 3D-DNA to scaffold contigs further."
 echo "Finished job at `date`"
 ```
 
+Make a new directory called /hifiasm-outfiles and place all the output files from hifiasm into it.
+
 ## Prepare files for Juicer
 
 ### Use BWA to create references
 
-First, convert the .gfa file of haploid 1 from the hifiasm output into a fasta file with awk (as per the [hifiasm FAQ](https://hifiasm.readthedocs.io/en/latest/faq.html)):
+Create a directory called /references. Convert the .gfa file of haploid 1 from the hifiasm output into a fasta file with awk (as per the [hifiasm FAQ](https://hifiasm.readthedocs.io/en/latest/faq.html)):
 
 ```
-awk '/^S/{print ">"$2;print $3}' test.p_ctg.gfa > test.p_ctg.fa
+awk '/^S/{print ">"$2;print $3}' /hifiasm-outfiles/thimblerry.asm.hic.hap1.p_ctg.gfa > references/thimbleberry.asm.hic.hap1.p_ctg.fa
 ```
 
-Next, create a directory called /references and cd into it. Then, use BWA to index by running this job:
+Next, cd into /references. Then, use BWA to index by running this job:
 
 ```
 #!/bin/bash
@@ -103,7 +105,8 @@ Next, create a directory called /references and cd into it. Then, use BWA to ind
 #SBATCH --mem=30Gb
 #SBATCH --account=
 
-module load
+cd /project/def-mtodesco/vschimma/thimbleberry/references/
+
 module load bwa
 
 bwa index *.fa
