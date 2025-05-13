@@ -78,7 +78,7 @@ echo "Finished job at `date`"
 
 ## Prepare files for Juicer
 
-# Use BWA to create references
+### Use BWA to create references
 
 First, convert the .gfa file of haploid 1 from the hifiasm output into a fasta file with awk (as per the [hifiasm FAQ](https://hifiasm.readthedocs.io/en/latest/faq.html)):
 
@@ -100,7 +100,7 @@ module load bwa
 bwa index *.fa
 ```
 
-# Git clone juicer
+### Git clone juicer
 
 Cd into wherever you store packages, make a juicer directory, and git clone juicer:
 
@@ -111,7 +111,7 @@ cd juicer/
 git clone https://github.com/aidenlab/juicer.git
 ```
 
-# Generating site positions
+### Generating site positions
 
 Return back to the project directory. Create a new directory called /restriction-sites and cd into it. Then, copy
 
@@ -140,7 +140,7 @@ module load python
 python generate_site_positions.py DpnII rp_hap1_ctg # use the name you made in generate_site_positions.py, not the file path
 ```
 
-# Get the chromosome sizes
+### Get the chromosome sizes
 
 ```
 #!/bin/bash
