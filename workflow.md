@@ -17,12 +17,21 @@ while in the same directory as the files you just downloaded.
 
 ## Quality assurance
 
-Use FastQC to verify high quality reads. Create a new directory and cd into it to store FastQC outputs. Then, run FastQC on the newly downloaded fastq files:
+Use FastQC to verify high quality reads. Create a new directory and cd into it to store FastQC outputs. Then, run FastQC on the newly downloaded fastq files in a job:
 
 ```
+#!/bin/bash
+
+#SBATCH --time=1:00:00
+#SBATCH --mem=30Gb
+#SBATCH --account=
+#SBATCH --out=fastqc-raw-reads.out
+
+cd /project/def-mtodesco/vschimma/thimbleberry/
+
 module load fastqc
 
-fastqc --outdir [path-to-dir]/fastqc-out [path-to-dir]/raw-data/*.fastq
+fastqc -o /fastqc-outfiles /raw-data/*.fastq
 ```
 
 
