@@ -31,7 +31,7 @@ cd /project/def-mtodesco/vschimma/thimbleberry/
 
 module load fastqc
 
-fastqc -o /fastqc-outfiles /raw-data/*.fastq
+fastqc -o ./fastqc-outfiles ./raw-data/*.fastq
 ```
 
 
@@ -125,9 +125,7 @@ git clone https://github.com/aidenlab/juicer.git
 
 ### Generating site positions
 
-Return back to the project directory. Create a new directory called /restriction-sites and cd into it. Then, copy
-
-Then, copy generate_site_positions.py ([path-to-packages]/juicer/misc/generate_site_positions.py) into /restriction-sites. Modify it by adding a new entry in filenames:
+Return back to the project directory. Create a new directory called /restriction-sites and cd into it. Then, copy generate_site_positions.py ([path-to-packages]/juicer/misc/generate_site_positions.py) into /restriction-sites. Modify it by adding a new entry in filenames:
 
 ```
   filenames = {
@@ -139,7 +137,7 @@ Then, copy generate_site_positions.py ([path-to-packages]/juicer/misc/generate_s
   }
 ```
 
- Then, run the following job:
+ Then, run the following job to generate the site positions:
 
 ```
 #!/bin/bash
@@ -154,6 +152,8 @@ python generate_site_positions.py DpnII rp_hap1_ctg # use the name you made in g
 
 ### Get the chromosome sizes
 
+Find the sizes of all the chromosomes:
+
 ```
 #!/bin/bash
 #SBATCH --time=1:00:00
@@ -164,4 +164,12 @@ for i in $(ls *DpnII.txt); do
   name=$(echo $i | cut -d "." -f 1 )
   awk 'BEGIN{OFS="\t"}{print $1, $NF}'  $i > "$name"".chrom.sizes"
 done
+```
+
+## Ruin juicer
+
+Use the following script to run juicer with many CPUs:
+
+```
+
 ```
