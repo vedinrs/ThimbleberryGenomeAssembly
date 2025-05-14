@@ -194,16 +194,16 @@ echo ""
 module load StdEnv/2020 bwa/0.7.17 java/17.0.2 samtools/1.15.1
 export PATH=$PATH:/home/~bin/juicer/CPU
 
-PROJECT=/project/def-mtodesco/vschimma/thimbleberry/
+PROJECT=/project/def-mtodesco/vschimma/thimbleberry
 cd $PROJECT/juicer-outfiles/
 
 #run juicer
 bash /home/vschimma/packages/juicer/CPU/juicer.sh \
--g rp_hap1_ctg -s DpnII \ #genome ID defined by -z command later, site
--S early \ # stage
--p $PROJECT/restriction_sites/thimbleberry.chrom.sizes \ # chromosome sizes
--y $PROJECT/restriction_sites/thimbleberry.asm.hic.hap1.p_ctg_DpnII.txt -z $PROJECT/references/thimbleberry.asm.hic.hap1.p_ctg.fa \ # restriction sites, reference genome
--t 28 # threads
+-g rp_hap1_ctg -s DpnII \
+-S early \ 
+-p $PROJECT/restriction_sites/thimbleberry.chrom.sizes \ 
+-y $PROJECT/restriction_sites/thimbleberry.asm.hic.hap1.p_ctg_DpnII.txt -z $PROJECT/references/thimbleberry.asm.hic.hap1.p_ctg.fa \ 
+-t 28 
 
 # ---------------------------------------------------------------------
 echo "Done Juicer Hi-C analysis.  Use 3D-DNA to scaffold contigs further."
@@ -211,3 +211,5 @@ echo "Done Juicer Hi-C analysis.  Use 3D-DNA to scaffold contigs further."
 
 echo "Finished job at `date`"
 ```
+
+## 3D-DNA assembly
