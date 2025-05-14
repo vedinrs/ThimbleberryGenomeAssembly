@@ -166,6 +166,14 @@ for i in $(ls *DpnII.txt); do
 done
 ```
 
+### Set up the fastq files
+
+Make a directory called /juicer-outfiles and inside make another directory called /fastq. After cd'ing into /fastq, make links to the hi-c reads in the /raw-reads directory using ln:
+```
+ln -s [path-to-read]/read_1.fastq read_1.fastq
+ln -s [path-to-read]/read_2.fastq read_2.fastq
+```
+
 ## Ruin juicer
 
 Use the following script to run juicer with many CPUs:
@@ -206,10 +214,44 @@ bash /home/vschimma/packages/juicer/CPU/juicer.sh \
 -t 28 
 
 # ---------------------------------------------------------------------
-echo "Done Juicer Hi-C analysis.  Use 3D-DNA to scaffold contigs further."
+echo "Done Juicer Hi-C analysis.  Use yahs to scaffold contigs further."
 # ---------------------------------------------------------------------
 
 echo "Finished job at `date`"
 ```
 
-## 3D-DNA assembly
+## Scaffold assembly using yahs
+
+Make a directory for the output from yahs called /yahs-outfiles. Then, run this job:
+
+```
+#!/bin/bash
+#SBATCH --time=1-00:00:00
+#SBATCH --mem=250G
+#SBATCH --cpus-per-task=32
+#SBATCH --account=def-mtodesco
+#SBATCH --output=yahs.out
+#SBATCH --error=yahs.err
+
+#####################################
+### Execution of programs ###########
+#####################################
+
+# ---------------------------------------------------------------------
+echo "Current working directory: `pwd`"
+echo "Starting run at: `date`"
+echo "SLURM_JOBID: " $SLURM_JOBID
+# ---------------------------------------------------------------------
+echo ""
+
+export PATH=$PATH:/home/vschimma/packages/yahs/yahs
+
+yahs -o yahs-outfiles/ -e GATC ./juicer-outfiles/contigs.fa ./juicer-outfiles/hic-to-contigs.bam
+
+# ---------------------------------------------------------------------
+echo "Done yahs pipeline assembly. Created scaffolds from contigs and Hi-C heatmap."
+# ---------------------------------------------------------------------
+
+echo "Finished job at `date`"
+
+```
