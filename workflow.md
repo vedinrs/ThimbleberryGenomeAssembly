@@ -174,7 +174,7 @@ Use the following script to run juicer with many CPUs:
 #!/bin/bash
 #SBATCH --nodes=1
 #SBATCH --time=1-00:00:00
-#SBATCH --mem=510G
+#SBATCH --mem=250G
 #SBATCH --cpus-per-task=32
 #SBATCH --account=def-mtodesco
 #SBATCH --output=juicer.out
