@@ -255,3 +255,7 @@ echo "Done yahs pipeline assembly. Created scaffolds from contigs and Hi-C heatm
 echo "Finished job at `date`"
 
 ```
+
+## Manually polish with Juicebox Assembly Tools
+
+Create a directory called /juicebox.
