@@ -176,6 +176,26 @@ ln -s [path-to-read]/read_2.fastq read_R2.fastq
 
 Make sure that the reads include _R1 and _R2 respectively, otherwise juicer.sh will not be able to interpret them correctly.
 
+### Link to a juicer script
+
+In the directory the job is being run in, make a link called scripts to the /CPU directory within the juicer package. It should look something like this:
+
+```
+ln -s /home/vschimma/packages/juicer/CPU
+
+# result:
+[path-to-dir]/thimbleberry
+              -- scripts -> /home/vschimma/packages/juicer/CPU
+              ...
+```
+
+Next, cd into scripts/common/ and use set up a juicer_tools jar file:
+
+```
+wget https://hicfiles.tc4ga.com/public/juicer/juicer_tools.1.9.9_jcuda.0.8.jar
+ln -s juicer_tools.1.9.9_jcuda.0.8.jar  juicer_tools.jar
+```
+
 ## Ruin juicer
 
 Use the following script to run juicer with many CPUs:
