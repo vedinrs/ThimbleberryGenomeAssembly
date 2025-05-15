@@ -118,8 +118,6 @@ Cd into wherever you store packages, make a juicer directory, and git clone juic
 
 ```
 cd /home/vschimma/packages/
-mkdir juicer/
-cd juicer/
 git clone https://github.com/aidenlab/juicer.git
 ```
 
