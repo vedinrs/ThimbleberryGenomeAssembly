@@ -178,15 +178,10 @@ Make sure that the reads include _R1 and _R2 respectively, otherwise juicer.sh w
 
 ### Link to a juicer script
 
-In the directory the job is being run in, make a link called scripts to the /CPU directory within the juicer package. It should look something like this:
+In the directory the job is being run in, make a link called scripts to the /CPU directory within the juicer package. 
 
 ```
 ln -s /home/vschimma/packages/juicer/CPU
-
-# result:
-[path-to-dir]/thimbleberry
-              -- scripts -> /home/vschimma/packages/juicer/CPU
-              ...
 ```
 
 Next, cd into scripts/common/ and use set up a juicer_tools jar file:
@@ -194,6 +189,28 @@ Next, cd into scripts/common/ and use set up a juicer_tools jar file:
 ```
 wget https://hicfiles.tc4ga.com/public/juicer/juicer_tools.1.9.9_jcuda.0.8.jar
 ln -s juicer_tools.1.9.9_jcuda.0.8.jar  juicer_tools.jar
+```
+
+Overall, the directory structure should look something like this:
+
+```
+[path-to-dir]/thimbleberry
+                /juicer-outfiles
+                    -- scripts -> /home/vschimma/packages/juicer/CPU
+                    /fastq
+                        --hic_R1.fastq -> [path-to-fastq]/hic-reads-SRR30502875_1.fastq
+                        --hic_R2.fastq -> [path-to-fastq]/hic-reads-SRR30502875_2.fastq
+                /references
+                    -- thimbleberry.asm.hic.hap1.p_ctg.fa
+                    -- thimbleberry.asm.hic.hap1.p_ctg.fa.amb
+                    -- thimbleberry.asm.hic.hap1.p_ctg.fa.ann
+                    -- thimbleberry.asm.hic.hap1.p_ctg.fa.bwt
+                    -- thimbleberry.asm.hic.hap1.p_ctg.fa.pac
+                    -- thimbleberry.asm.hic.hap1.p_ctg.fa.sa
+                /restriction-sites
+                    -- generate_positions.py (edited)
+		                -- rp.chrom.sizes
+  		              -- rp_hap1_ctg_DpnII.txt
 ```
 
 ## Ruin juicer
@@ -224,16 +241,16 @@ echo ""
 module load StdEnv/2020 bwa/0.7.17 java/17.0.2 samtools/1.15.1
 export PATH=$PATH:/home/~bin/juicer/CPU
 
-PROJECT=/project/def-mtodesco/vschimma/thimbleberry
-cd $PROJECT/juicer-outfiles/
+cd /project/def-mtodesco/vschimma/thimbleberry/juicer-outfiles/
 
 #run juicer
 bash /home/vschimma/packages/juicer/CPU/juicer.sh \
 -g rp_hap1_ctg -s DpnII \
--S early \ 
--p $PROJECT/restriction_sites/thimbleberry.chrom.sizes \ 
--y $PROJECT/restriction_sites/thimbleberry.asm.hic.hap1.p_ctg_DpnII.txt -z $PROJECT/references/thimbleberry.asm.hic.hap1.p_ctg.fa \ 
--t 28 
+-S early \
+-p /project/def-mtodesco/vschimma/thimbleberry/restriction-sites/rp.chrom.sizes \
+-y /project/def-mtodesco/vschimma/thimbleberry/restriction-sites/rp_hap1_ctg_DpnII.txt \
+-z /project/def-mtodesco/vschimma/thimbleberry/references/thimbleberry.asm.hic.hap1.p_ctg.fa \
+-t 32
 
 # ---------------------------------------------------------------------
 echo "Done Juicer Hi-C analysis.  Use yahs to scaffold contigs further."
