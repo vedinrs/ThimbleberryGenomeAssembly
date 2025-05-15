@@ -170,9 +170,11 @@ done
 
 Make a directory called /juicer-outfiles and inside make another directory called /fastq. After cd'ing into /fastq, make links to the hi-c reads in the /raw-reads directory using ln:
 ```
-ln -s [path-to-read]/read_1.fastq read_1.fastq
-ln -s [path-to-read]/read_2.fastq read_2.fastq
+ln -s [path-to-read]/read_1.fastq read_R1.fastq
+ln -s [path-to-read]/read_2.fastq read_R2.fastq
 ```
+
+Make sure that the reads include _R1 and _R2 respectively, otherwise juicer.sh will not be able to interpret them correctly.
 
 ## Ruin juicer
 
