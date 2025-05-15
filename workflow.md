@@ -296,3 +296,9 @@ echo "Finished job at `date`"
 ## Manually polish with Juicebox Assembly Tools
 
 Create a directory called /juicebox-outfiles.
+
+
+
+## Use BUSCO to assess genome assembly quality
+
+
