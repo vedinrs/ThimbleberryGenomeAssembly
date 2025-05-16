@@ -246,7 +246,7 @@ bash scripts/juicer.sh \
 -y restriction_sites/rp_hap1_ctg_DpnII.txt \
 -z references/thimbleberry.asm.hic.hap1.p_ctg.fa \
 -t 32
--D /project/def-mtodesco/vschimma/packages/juicer/
+-D /project/def-mtodesco/vschimma/packages/juicer
 
 # ---------------------------------------------------------------------
 echo "Done Juicer Hi-C analysis.  Use yahs to scaffold contigs further."
@@ -255,7 +255,7 @@ echo "Done Juicer Hi-C analysis.  Use yahs to scaffold contigs further."
 echo "Finished job at `date`"
 ```
 
-Note: "-D /project/def-mtodesco/vschimma/packages/juicer/" is incredibly important as you are directing juicer.sh to where all the other juicer commands are being stored.
+Note: "-D /project/def-mtodesco/vschimma/packages/juicer" is incredibly important as you are directing juicer.sh to where all the other juicer commands are being stored.
 
 ## Scaffold assembly using yahs
 
