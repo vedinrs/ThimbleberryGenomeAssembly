@@ -255,6 +255,8 @@ echo "Done Juicer Hi-C analysis.  Use yahs to scaffold contigs further."
 echo "Finished job at `date`"
 ```
 
+Note: "-D /project/def-mtodesco/vschimma/packages/juicer/" is incredibly important as you are directing juicer.sh to where all the other juicer commands are being stored.
+
 ## Scaffold assembly using yahs
 
 Make a directory for the output from yahs called /yahs-outfiles. Then, run this job:
