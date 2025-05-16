@@ -117,7 +117,7 @@ bwa index *.fa
 Cd into wherever you store packages, make a juicer directory, and git clone juicer:
 
 ```
-cd /home/vschimma/packages/
+cd /project/def-mtodesco/vschimma/packages
 git clone https://github.com/aidenlab/juicer.git
 ```
 
@@ -166,7 +166,7 @@ done
 
 ### Set up the fastq files
 
-Make a directory called /juicer-outfiles and inside make another directory called /fastq. After cd'ing into /fastq, make links to the hi-c reads in the /raw-reads directory using ln:
+Make a directory called /juicer and inside make another directory called /fastq. After cd'ing into /fastq, make links to the hi-c reads in the /raw-reads directory using ln:
 ```
 ln -s [path-to-read]/read_1.fastq read_R1.fastq
 ln -s [path-to-read]/read_2.fastq read_R2.fastq
@@ -179,7 +179,7 @@ Make sure that the reads include _R1 and _R2 respectively, otherwise juicer.sh w
 In the directory the job is being run in, make a link called scripts to the /CPU directory within the juicer package. 
 
 ```
-ln -s /home/vschimma/packages/juicer/CPU
+ln -s /project/def-mtodesco/vschimma/packages/juicer/CPU
 ```
 
 Next, cd into scripts/common/ and use set up a juicer_tools jar file:
@@ -193,22 +193,19 @@ Overall, the directory structure should look something like this:
 
 ```
 [path-to-dir]/thimbleberry
-                /juicer-outfiles
-                    -- scripts -> /home/vschimma/packages/juicer/CPU
-                    /fastq
-                        --hic_R1.fastq -> [path-to-fastq]/hic-reads-SRR30502875_1.fastq
-                        --hic_R2.fastq -> [path-to-fastq]/hic-reads-SRR30502875_2.fastq
-                /references
-                    -- thimbleberry.asm.hic.hap1.p_ctg.fa
-                    -- thimbleberry.asm.hic.hap1.p_ctg.fa.amb
-                    -- thimbleberry.asm.hic.hap1.p_ctg.fa.ann
-                    -- thimbleberry.asm.hic.hap1.p_ctg.fa.bwt
-                    -- thimbleberry.asm.hic.hap1.p_ctg.fa.pac
-                    -- thimbleberry.asm.hic.hap1.p_ctg.fa.sa
-                /restriction-sites
-                    -- generate_positions.py (edited)
-		                -- rp.chrom.sizes
-  		              -- rp_hap1_ctg_DpnII.txt
+		/juicer
+			-- scripts -> /project/def-mtodesco/vschimma/packages/juicer/CPU
+			/fastq
+                        	--hic_R1.fastq -> [path-to-fastq]/hic-reads-SRR30502875_1.fastq
+                        	--hic_R2.fastq -> [path-to-fastq]/hic-reads-SRR30502875_2.fastq
+			/references
+ 				-- thimbleberry.asm.hic.hap1.p_ctg.fa
+                    		-- thimbleberry.asm.hic.hap1.p_ctg.fa.amb
+                    		-- thimbleberry.asm.hic.hap1.p_ctg.fa.ann
+                    		-- thimbleberry.asm.hic.hap1.p_ctg.fa.bwt
+                    		-- thimbleberry.asm.hic.hap1.p_ctg.fa.pac
+                    		-- thimbleberry.asm.hic.hap1.p_ctg.fa.sa
+                	/restriction-sites -> ../restriction-sites/
 ```
 
 ## Ruin juicer
@@ -237,18 +234,19 @@ echo "SLURM_JOBID: " $SLURM_JOBID
 echo ""
 
 module load StdEnv/2020 bwa/0.7.17 java/17.0.2 samtools/1.15.1
-export PATH=$PATH:/home/~bin/juicer/CPU
+export PATH=$PATH:/project/def-mtodesco/vschimma/packages/juicer/CPU
 
-cd /project/def-mtodesco/vschimma/thimbleberry/juicer-outfiles/
+cd /project/def-mtodesco/vschimma/thimbleberry/juicer/
 
 #run juicer
-bash /home/vschimma/packages/juicer/CPU/juicer.sh \
+bash scripts/juicer.sh \
 -g rp_hap1_ctg -s DpnII \
 -S early \
--p /project/def-mtodesco/vschimma/thimbleberry/restriction-sites/rp.chrom.sizes \
--y /project/def-mtodesco/vschimma/thimbleberry/restriction-sites/rp_hap1_ctg_DpnII.txt \
--z /project/def-mtodesco/vschimma/thimbleberry/references/thimbleberry.asm.hic.hap1.p_ctg.fa \
+-p restriction_sites/rp.chrom.sizes \
+-y restriction_sites/rp_hap1_ctg_DpnII.txt \
+-z references/thimbleberry.asm.hic.hap1.p_ctg.fa \
 -t 32
+-D /project/def-mtodesco/vschimma/packages/juicer/
 
 # ---------------------------------------------------------------------
 echo "Done Juicer Hi-C analysis.  Use yahs to scaffold contigs further."
@@ -283,7 +281,7 @@ echo ""
 
 export PATH=$PATH:/home/vschimma/packages/yahs/yahs
 
-yahs -o yahs-outfiles/ -e GATC ./juicer-outfiles/contigs.fa ./juicer-outfiles/hic-to-contigs.bam
+yahs -o yahs-outfiles/ -e GATC ./juicer/contigs.fa ./juicer/hic-to-contigs.bam
 
 # ---------------------------------------------------------------------
 echo "Done yahs pipeline assembly. Created scaffolds from contigs and Hi-C heatmap."
@@ -301,4 +299,4 @@ Create a directory called /juicebox-outfiles.
 
 ## Use BUSCO to assess genome assembly quality
 
-
+Create a directory called /busco-outfiles
