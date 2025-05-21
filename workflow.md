@@ -260,7 +260,60 @@ Note: "-D /project/def-mtodesco/vschimma/packages/juicer" is incredibly importan
 
 ## Prepare files for yahs
 
+Use the following script to convert merge_dups.txt into a .bed file, allowing for easier usage of yahs.
 
+```
+#!/bin/bash
+
+#SBATCH --time=3:00:00
+#SBATCH --mem=12G
+#SBATCH --account=def-mtodesco
+
+#####################################
+### Execution of programs ###########
+#####################################
+
+# ---------------------------------------------------------------------
+echo "Current working directory: `pwd`"
+echo "Starting run at: `date`"
+echo "SLURM_JOBID: " $SLURM_JOBID
+# ---------------------------------------------------------------------
+echo ""
+
+cd ./juicer/aligned
+
+awk '
+{
+     if ($9 > 0 && $12 > 0) {
+    # Calculate end position for read 1 using pos1 and cigar1
+    cigar = $10
+    pos_start1 = $3
+    sum1 = 0
+    while (match(cigar, /([0-9]+)([MDNX=])/, arr)) {
+        sum1 += arr[1]
+        cigar = substr(cigar, RSTART + RLENGTH)
+    }
+    pos_end1 = pos_start1 + sum1  # End position for read 1
+
+    # Calculate end position for read 2 using pos2 and cigar2
+    cigar = $13
+    pos_start2 = $7
+    sum2 = 0
+    while (match(cigar, /([0-9]+)([MDNX=])/, arr)) {
+        sum2 += arr[1]
+        cigar = substr(cigar, RSTART + RLENGTH)
+    }
+    pos_end2 = pos_start2 + sum2  # End position for read 2
+
+    # Print interleaved output for read 1 and read 2
+    print $2, pos_start1, pos_end1, $15"/1", $9
+    print $6, pos_start2, pos_end2, $16"/2", $12
+}
+}
+' merged_nodups.txt > merged_nodups_for_yahs.bed
+
+echo "Finished job at `date`"
+```
 
 ## Scaffold assembly using yahs
 
