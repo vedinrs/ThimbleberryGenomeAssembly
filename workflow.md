@@ -247,6 +247,7 @@ bash scripts/juicer.sh \
 -z references/thimbleberry.asm.hic.hap1.p_ctg.fa \
 -t 32
 -D /project/def-mtodesco/vschimma/packages/juicer
+--assembly
 
 # ---------------------------------------------------------------------
 echo "Done Juicer Hi-C analysis.  Use yahs to scaffold contigs further."
@@ -256,6 +257,10 @@ echo "Finished job at `date`"
 ```
 
 Note: "-D /project/def-mtodesco/vschimma/packages/juicer" is incredibly important as you are directing juicer.sh to where all the other juicer commands are being stored.
+
+## Prepare files for yahs
+
+
 
 ## Scaffold assembly using yahs
 
@@ -283,7 +288,7 @@ echo ""
 
 export PATH=$PATH:/home/vschimma/packages/yahs/yahs
 
-yahs -o yahs-outfiles/ -e GATC ./juicer/contigs.fa ./juicer/hic-to-contigs.bam
+yahs -o yahs-outfiles/ -e GATC ./juicer/references/thimbleberry.asm.hic.hap1.p_ctg.fa ./juicer/splits/merged_nodups_for_yahs.bed
 
 # ---------------------------------------------------------------------
 echo "Done yahs pipeline assembly. Created scaffolds from contigs and Hi-C heatmap."
