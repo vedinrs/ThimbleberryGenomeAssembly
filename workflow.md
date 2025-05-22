@@ -322,11 +322,12 @@ Make a directory for the output from yahs called /yahs-outfiles. Then, run this 
 ```
 #!/bin/bash
 #SBATCH --time=1-00:00:00
-#SBATCH --mem=250G
-#SBATCH --cpus-per-task=32
+#SBATCH --mem=100G
 #SBATCH --account=def-mtodesco
 #SBATCH --output=yahs.out
 #SBATCH --error=yahs.err
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=2
 
 #####################################
 ### Execution of programs ###########
@@ -339,9 +340,19 @@ echo "SLURM_JOBID: " $SLURM_JOBID
 # ---------------------------------------------------------------------
 echo ""
 
-export PATH=$PATH:/home/vschimma/packages/yahs/yahs
+# --- MODULES ---
 
-yahs -o yahs-outfiles/ -e GATC ./juicer/references/thimbleberry.asm.hic.hap1.p_ctg.fa ./juicer/aligned/merged_nodups_for_yahs.bed
+module load StdEnv/2023 gcc/12.3 samtools/1.20
+
+# ---------------
+
+export PATH=$PATH:/home/vschimma/packages/yahs
+
+CONTIG=./juicer/references/thimbleberry.asm.hic.hap1.p_ctg.fa
+
+samtools faidx $CONTIG
+
+yahs -o yahs-outfiles/ -e GATC $CONTIG ./juicer/aligned/merged_nodups_for_yahs.bed
 
 # ---------------------------------------------------------------------
 echo "Done yahs pipeline assembly. Created scaffolds from contigs and Hi-C heatmap."
