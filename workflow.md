@@ -341,7 +341,7 @@ echo ""
 
 export PATH=$PATH:/home/vschimma/packages/yahs/yahs
 
-yahs -o yahs-outfiles/ -e GATC ./juicer/references/thimbleberry.asm.hic.hap1.p_ctg.fa ./juicer/splits/merged_nodups_for_yahs.bed
+yahs -o yahs-outfiles/ -e GATC ./juicer/references/thimbleberry.asm.hic.hap1.p_ctg.fa ./juicer/aligned/merged_nodups_for_yahs.bed
 
 # ---------------------------------------------------------------------
 echo "Done yahs pipeline assembly. Created scaffolds from contigs and Hi-C heatmap."
@@ -349,6 +349,39 @@ echo "Done yahs pipeline assembly. Created scaffolds from contigs and Hi-C heatm
 
 echo "Finished job at `date`"
 
+```
+
+### Create the hic and assembly files for Juicerbox Assembly Tools
+
+In order to use the scaffold and hic map in Juicebox, prepare the appropriate files using this script:
+
+```
+#!/bin/bash
+
+#SBATCH --time=3-0
+#SBATCH --mem=256G
+#SBATCH --account=def-mtodesco
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=64
+
+#####################################
+### Execution of programs ###########
+#####################################
+
+# ---------------------------------------------------------------------
+echo "Current working directory: `pwd`"
+echo "Starting run at: `date`"
+echo "SLURM_JOBID: " $SLURM_JOBID
+# ---------------------------------------------------------------------
+echo ""
+
+module load StdEnv/2020 python/3.11.2 java/17.0.2 lastz/1.04.03
+
+/home/vschimma/packages/yahs/juicer pre -a -o yahs-outfiles yahs.out.bin yahs.out_scaffolds_final.agp thimbleberry.asm.hic.hap1.p_ctg.fa >yahs-outfiles.log 2>&1
+
+java -jar -Xmx240G /project/def-mtodesco/vschimma/thimbleberry/juicer/scripts/common/juicer_tools.1.9.9_jcuda.0.8.jar pre yahs-outfiles.txt yahs-outfiles.hic.part <(cat yahs-outfiles.log  | grep PRE_C_SIZE | awk '{print $2" "$3}')) && (mv yahs-outfiles.hic.part yahs-outfiles.hic)
+
+echo "Finished job at `date`"
 ```
 
 ## Manually polish with Juicebox Assembly Tools
