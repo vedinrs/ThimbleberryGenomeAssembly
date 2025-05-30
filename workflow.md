@@ -361,19 +361,22 @@ echo "Done yahs pipeline assembly. Created scaffolds from contigs and Hi-C heatm
 echo "Finished job at `date`"
 
 ```
+yahs will create a hidden file called .bin in the yahs-outfiles directory. Rename this file to yahs.out.bin.
+
 
 ### Create the hic and assembly files for Juicerbox Assembly Tools
 
-In order to use the scaffold and hic map in Juicebox, prepare the appropriate files using this script:
+Create a directory called juicebox-infiles. In order to use the scaffold and hic map in Juicebox, prepare the appropriate files using this script:
 
 ```
 #!/bin/bash
 
-#SBATCH --time=3-0
-#SBATCH --mem=256G
+#SBATCH --time=3:00:00
+#SBATCH --mem=100G
 #SBATCH --account=def-mtodesco
 #SBATCH --nodes=1
-#SBATCH --ntasks-per-node=64
+#SBATCH --ntasks-per-node=32
+#SBATCH --output=hic-assembly.out
 
 #####################################
 ### Execution of programs ###########
@@ -386,19 +389,27 @@ echo "SLURM_JOBID: " $SLURM_JOBID
 # ---------------------------------------------------------------------
 echo ""
 
+# --- MODULES ---
+
 module load StdEnv/2020 python/3.11.2 java/17.0.2 lastz/1.04.03
 
-/home/vschimma/packages/yahs/juicer pre -a -o yahs-outfiles yahs.out.bin yahs.out_scaffolds_final.agp thimbleberry.asm.hic.hap1.p_ctg.fa >yahs-outfiles.log 2>&1
+# ---------------
 
-java -jar -Xmx240G /project/def-mtodesco/vschimma/thimbleberry/juicer/scripts/common/juicer_tools.1.9.9_jcuda.0.8.jar pre yahs-outfiles.txt yahs-outfiles.hic.part <(cat yahs-outfiles.log  | grep PRE_C_SIZE | awk '{print $2" "$3}')) && (mv yahs-outfiles.hic.part yahs-outfiles.hic)
+cd juicebox-infiles/
+
+/home/vschimma/packages/yahs/juicer pre -a -o JBAT ../yahs-outfiles/yahs.out.bin ../yahs-outfiles/_scaffolds_final.agp ../juicer/references/thimbleberry.asm.hic.hap1.p_ctg.fa.fai >JBAT.log 2>&1
+
+(java -jar -Xmx240G /project/def-mtodesco/vschimma/thimbleberry/juicer/scripts/common/juicer_tools.1.9.9_jcuda.0.8.jar pre JBAT.txt JBAT.hic.part <(cat JBAT.log | grep PRE_C_SIZE | awk '{print $2" "$3}')) \
+&& (mv JBAT.hic.part JBAT.hic)
 
 echo "Finished job at `date`"
 ```
 
 ## Manually polish with Juicebox Assembly Tools
 
-Create a directory called /juicebox-outfiles.
+Load the .hic file from juicebox-infiles/ and use the corresponding .assembly file in Juicebox Assembly Tools. Then, complete manual curation. The [Juicebox tutorial video](https://www.youtube.com/watch?v=Nj7RhQZHM18) may be helpful.
 
+Once complete, create a directory called /juicebox-outfiles and save the result there.
 
 
 ## Use BUSCO to assess genome assembly quality
