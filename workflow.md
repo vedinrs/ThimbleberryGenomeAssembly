@@ -45,10 +45,10 @@ If it is taking a long time to find a node, use 32 cpus instead of 48. Make sure
 
 ```
 #!/bin/bash
-#SBATCH --time=5-00:00:00
+#SBATCH --time=1-00:00:00
 #SBATCH --mem=192000M
-#SBATCH --account=
-#SBATCH --cpus-per-task=48
+#SBATCH --account=def-mtodesco
+#SBATCH --cpus-per-task=32
 #SBATCH --output=hifiasm.out
 #SBATCH --error=hifiasm.err
 
@@ -72,11 +72,13 @@ module load hifiasm/0.19.5
 ##### Variables / data ##############
 #####################################
 
-HiC_1=/project/def-mtodesco/vschimma/thimbleberry/raw-data/
-HiC_2=/project/def-mtodesco/vschimma/thimbleberry/raw-data/
-Hifi_fastq=/project/def-mtodesco/vschimma/thimbleberry/raw-data/
+HiC_1=/project/def-mtodesco/vschimma/thimbleberry/raw-data/hic-reads-SRR30502875_1.fastq
+HiC_2=/project/def-mtodesco/vschimma/thimbleberry/raw-data/hic-reads-SRR30502875_2.fastq
+Hifi_fastq=/project/def-mtodesco/vschimma/thimbleberry/raw-data/raw-reads-SRR30533059.fastq
 
-hifiasm -o thimbleberry.asm -t 48 --h1 $HiC_1 --h2 $HiC_2 $Hifi_fastq -s 0.4 --hom-cov 128
+cd hifiasm-outfiles/
+
+hifiasm -o thimbleberry.asm -t 32 --h1 $HiC_1 --h2 $HiC_2 $Hifi_fastq -s 0.32 --hom-cov 60
 
 # ---------------------------------------------------------------------
 echo "Done assembly with Hifiasm. Use 3D-DNA to scaffold contigs further."
