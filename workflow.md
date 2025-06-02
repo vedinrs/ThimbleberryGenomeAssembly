@@ -43,6 +43,8 @@ This code is adapted from a [workflow](https://github.com/kaede0e/stinging_nettl
 
 If it is taking a long time to find a node, use 32 cpus instead of 48. Make sure to change it in both the SBATCH comment and in the hifiasm command.
 
+Make a new directory called /hifiasm-outfiles as well.
+
 ```
 #!/bin/bash
 #SBATCH --time=1-00:00:00
@@ -86,8 +88,6 @@ echo "Done assembly with Hifiasm. Use 3D-DNA to scaffold contigs further."
 
 echo "Finished job at `date`"
 ```
-
-Make a new directory called /hifiasm-outfiles and place all the output files from hifiasm into it.
 
 ## Prepare files for Juicer
 
