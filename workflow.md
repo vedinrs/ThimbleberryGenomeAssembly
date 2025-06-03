@@ -106,6 +106,7 @@ Next, cd into /references. Then, use BWA to index by running this job:
 #SBATCH --time=1:00:00
 #SBATCH --mem=30Gb
 #SBATCH --account=
+#SBATCH --output=bwa-indexing.out
 
 cd /project/def-mtodesco/vschimma/thimbleberry/references/
 
@@ -125,7 +126,7 @@ git clone https://github.com/aidenlab/juicer.git
 
 ### Generating site positions
 
-Return back to the project directory. Create a new directory called /restriction-sites and cd into it. Then, copy generate_site_positions.py ([path-to-packages]/juicer/misc/generate_site_positions.py) into /restriction-sites. Modify it by adding a new entry in filenames:
+Return back to the project directory. Create a new directory called /restriction_sites and cd into it. Then, copy generate_site_positions.py ([path-to-packages]/juicer/misc/generate_site_positions.py) into /restriction_sites. Modify it by adding a new entry in filenames:
 
 ```
   filenames = {
@@ -133,7 +134,7 @@ Return back to the project directory. Create a new directory called /restriction
     'mm9' : '/seq/references/Mus_musculus_assembly9.fasta',
     'mm10': '/seq/references/Mus_musculus_assembly10.fasta',
     'hg18': '/seq/references/Homo_sapiens_assembly18.fasta',
-    'rp_hap1_ctg': '../references/thimbleberry.asm.hic.hap1.p_ctg.fa', #MODIFY HERE: put your contig/assembly and its path
+    'rp_hap1_ctg': '../references/thimbleberry.asm.hic.hap1.p_ctg.fa', #MODIFY HERE!!! put your contig/assembly name and its path
   }
 ```
 
@@ -144,6 +145,7 @@ Return back to the project directory. Create a new directory called /restriction
 #SBATCH --time=1:00:00
 #SBATCH --mem=30Gb
 #SBATCH --account=
+#SBATCH --output=generate-site-positions.out
 
 module load python
 
