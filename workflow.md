@@ -89,26 +89,29 @@ echo "Done assembly with Hifiasm. Use 3D-DNA to scaffold contigs further."
 echo "Finished job at `date`"
 ```
 
+The next few steps for the pipeline will be split up as both haplotypes are processed. Make a folder for each haplotype (hap1 and hap2 will be used in this pipeline). The process for haplotype 1 will be used in the scripts, but will be the same for haplotype 2.
+
 ## Prepare files for Juicer
 
 ### Use BWA to create references
 
-Create a directory called /references. Convert the .gfa file of haploid 1 from the hifiasm output into a fasta file with awk (as per the [hifiasm FAQ](https://hifiasm.readthedocs.io/en/latest/faq.html)):
+Create a directory called /references in your haplotype folder. Convert the .gfa file of haploid 1 or 2 from the hifiasm output into a fasta file with awk (as per the [hifiasm FAQ](https://hifiasm.readthedocs.io/en/latest/faq.html)):
 
 ```
-awk '/^S/{print ">"$2;print $3}' /hifiasm-outfiles/thimblerry.asm.hic.hap1.p_ctg.gfa > references/thimbleberry.asm.hic.hap1.p_ctg.fa
+awk '/^S/{print ">"$2;print $3}' /hifiasm-outfiles/thimblerry.asm.hic.hap1.p_ctg.gfa > hap1/references/thimbleberry.asm.hic.hap1.p_ctg.fa
 ```
 
 Next, cd into /references. Then, use BWA to index by running this job:
 
 ```
 #!/bin/bash
+
 #SBATCH --time=1:00:00
 #SBATCH --mem=30Gb
-#SBATCH --account=
-#SBATCH --output=bwa-indexing.out
+#SBATCH --account=def-mtodesco
+#SBATCH --output=hap2/bwa-indexing.out
 
-cd /project/def-mtodesco/vschimma/thimbleberry/references/
+cd /project/def-mtodesco/vschimma/thimbleberry/hap2/references/
 
 module load bwa
 
@@ -142,14 +145,17 @@ Return back to the project directory. Create a new directory called /restriction
 
 ```
 #!/bin/bash
+
 #SBATCH --time=1:00:00
 #SBATCH --mem=30Gb
-#SBATCH --account=
-#SBATCH --output=generate-site-positions.out
+#SBATCH --account=def-mtodesco
+#SBATCH --output=hap2/generate-site-positions.out
+
+cd /project/def-mtodesco/vschimma/thimbleberry/hap2/restriction_sites/
 
 module load python
 
-python generate_site_positions.py DpnII rp_hap1_ctg # use the name you made in generate_site_positions.py, not the file path
+python generate_site_positions.py DpnII rp_hap2_ctg # use the name you made in generate_site_positions.py, not the file path
 ```
 
 ### Get the chromosome sizes
@@ -161,6 +167,9 @@ Find the sizes of all the chromosomes:
 #SBATCH --time=1:00:00
 #SBATCH --mem=30Gb
 #SBATCH --account=
+#SBATCH --output=chromosome-sizes.out
+
+cd /project/def-mtodesco/vschimma/thimbleberry/hap1/restriction_sites/
 
 for i in $(ls *DpnII.txt); do
   name=$(echo $i | cut -d "." -f 1 )
@@ -198,18 +207,12 @@ Overall, the directory structure should look something like this:
 ```
 [path-to-dir]/thimbleberry
 		/juicer
-			-- scripts -> /project/def-mtodesco/vschimma/packages/juicer/CPU
 			/fastq
                         	--hic_R1.fastq -> [path-to-fastq]/hic-reads-SRR30502875_1.fastq
                         	--hic_R2.fastq -> [path-to-fastq]/hic-reads-SRR30502875_2.fastq
-			/references
- 				-- thimbleberry.asm.hic.hap1.p_ctg.fa
-                    		-- thimbleberry.asm.hic.hap1.p_ctg.fa.amb
-                    		-- thimbleberry.asm.hic.hap1.p_ctg.fa.ann
-                    		-- thimbleberry.asm.hic.hap1.p_ctg.fa.bwt
-                    		-- thimbleberry.asm.hic.hap1.p_ctg.fa.pac
-                    		-- thimbleberry.asm.hic.hap1.p_ctg.fa.sa
-                	/restriction-sites -> ../restriction-sites/
+			references -> ../references/
+                	restriction-sites -> ../restriction-sites/
+			scripts -> /project/def-mtodesco/vschimma/packages/juicer/CPU
 ```
 
 ## Ruin juicer
@@ -223,8 +226,8 @@ Use the following script to run juicer with many CPUs:
 #SBATCH --mem=250G
 #SBATCH --cpus-per-task=32
 #SBATCH --account=def-mtodesco
-#SBATCH --output=juicer.out
-#SBATCH --error=juicer.err
+#SBATCH --output=hap1/juicer.out
+#SBATCH --error=hap1/juicer.err
 
 #####################################
 ### Execution of programs ###########
@@ -240,7 +243,7 @@ echo ""
 module load StdEnv/2020 bwa/0.7.17 java/17.0.2 samtools/1.15.1
 export PATH=$PATH:/project/def-mtodesco/vschimma/packages/juicer/CPU
 
-cd /project/def-mtodesco/vschimma/thimbleberry/juicer/
+cd /project/def-mtodesco/vschimma/thimbleberry/hap1/juicer/
 
 #run juicer
 bash scripts/juicer.sh \
@@ -272,6 +275,7 @@ Use the following script to convert merge_dups.txt into a .bed file, allowing fo
 #SBATCH --time=3:00:00
 #SBATCH --mem=12G
 #SBATCH --account=def-mtodesco
+#SBATCH --output=hap1/make-bed.out
 
 #####################################
 ### Execution of programs ###########
@@ -284,7 +288,7 @@ echo "SLURM_JOBID: " $SLURM_JOBID
 # ---------------------------------------------------------------------
 echo ""
 
-cd ./juicer/aligned
+cd ./hap1/juicer/aligned
 
 awk '
 {
@@ -328,10 +332,11 @@ Make a directory for the output from yahs called /yahs-outfiles. Then, run this 
 #SBATCH --time=1-00:00:00
 #SBATCH --mem=100G
 #SBATCH --account=def-mtodesco
-#SBATCH --output=yahs.out
-#SBATCH --error=yahs.err
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=2
+#SBATCH --output=hap1/yahs.out
+#SBATCH --error=hap1/yahs.err
+
 
 #####################################
 ### Execution of programs ###########
@@ -356,7 +361,7 @@ CONTIG=./juicer/references/thimbleberry.asm.hic.hap1.p_ctg.fa
 
 samtools faidx $CONTIG
 
-yahs -o yahs-outfiles/ -e GATC $CONTIG ./juicer/aligned/merged_nodups_for_yahs.bed
+yahs -o hap1/yahs-outfiles/yahs.out -e GATC $CONTIG ./hap1/juicer/aligned/merged_nodups_for_yahs.bed
 
 # ---------------------------------------------------------------------
 echo "Done yahs pipeline assembly. Created scaffolds from contigs and Hi-C heatmap."
