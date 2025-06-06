@@ -357,7 +357,7 @@ module load StdEnv/2023 gcc/12.3 samtools/1.20
 
 export PATH=$PATH:/home/vschimma/packages/yahs
 
-CONTIG=./juicer/references/thimbleberry.asm.hic.hap1.p_ctg.fa
+CONTIG=.hap1/juicer/references/thimbleberry.asm.hic.hap1.p_ctg.fa
 
 samtools faidx $CONTIG
 
@@ -370,8 +370,6 @@ echo "Done yahs pipeline assembly. Created scaffolds from contigs and Hi-C heatm
 echo "Finished job at `date`"
 
 ```
-yahs will create a hidden file called .bin in the yahs-outfiles directory. Rename this file to yahs.out.bin.
-
 
 ### Create the hic and assembly files for Juicerbox Assembly Tools
 
@@ -385,7 +383,7 @@ Create a directory called juicebox-infiles. In order to use the scaffold and hic
 #SBATCH --account=def-mtodesco
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=32
-#SBATCH --output=hic-assembly.out
+#SBATCH --output=hap1/hic-assembly.out
 
 #####################################
 ### Execution of programs ###########
@@ -404,7 +402,7 @@ module load StdEnv/2020 python/3.11.2 java/17.0.2 lastz/1.04.03
 
 # ---------------
 
-cd juicebox-infiles/
+cd hap1/juicebox-infiles/
 
 /home/vschimma/packages/yahs/juicer pre -a -o JBAT ../yahs-outfiles/yahs.out.bin ../yahs-outfiles/_scaffolds_final.agp ../juicer/references/thimbleberry.asm.hic.hap1.p_ctg.fa.fai >JBAT.log 2>&1
 
