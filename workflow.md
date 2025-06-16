@@ -421,4 +421,20 @@ Once complete, create a directory called /juicebox-outfiles and save the result 
 
 ## Use BUSCO to assess genome assembly quality
 
-Create a directory called /busco-outfiles
+Create a directory called /busco-outfiles. Throughout the pipeline, it is good to use BUSCO to analyze the quality of the assembly. To do so, use the following script:
+
+```
+
+```
+
+## Mask duplicated sequences using Red
+
+Using Red, mask duplicated sequences using the folliwing script:
+
+```
+
+```
+
+## Genome annotation with EDTA
+
+To use EDTA, it is easiest to set up a Conda environment.
