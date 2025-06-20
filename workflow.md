@@ -427,6 +427,22 @@ Create a directory called /busco-outfiles. Throughout the pipeline, it is good t
 
 ```
 
+## Reorder genome based on raspberry
+
+The next step is to align the chromosomes with the raspberry chromosomes to make annotation later on much easier. To start this process, we will use Mummer.
+
+## Using Mummer
+
+## Reordering chromosomes manually
+
+The following commands were used to manually reorder the chromosomes within the fasta file.
+
+```
+seqkit split -i -O reordered/ ./mummer-infiles/hap1-names.fasta
+
+seqkit seq -t DNA --reverse hap1-names.part_hap1-3-34435378.fasta > hap1-3-reverse.fasta
+```
+
 ## Mask duplicated sequences using Red
 
 Using Red, mask duplicated sequences using the folliwing script:
