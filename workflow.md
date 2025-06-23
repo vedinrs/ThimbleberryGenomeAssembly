@@ -429,9 +429,132 @@ Create a directory called /busco-outfiles. Throughout the pipeline, it is good t
 
 ## Reorder genome based on raspberry
 
-The next step is to align the chromosomes with the raspberry chromosomes to make annotation later on much easier. To start this process, we will use Mummer.
+The next step is to align the chromosomes with the raspberry chromosomes to make annotation later on much easier. To start this process, we will complete some manual curation and use Mummer.
+
+## Removing short sequences
+
+At this point, there are some sequences not placed on any particular chromosome. It's important to remove these sequences to then align the rest of the data to the raspberry genome. To do this, use the following script:
+
+```
+#!/bin/bash
+#SBATCH --account=def-mtodesco
+#SBATCH --time=00:50:00
+#SBATCH --mem=10G
+#SBATCH --ntasks=1
+#SBATCH --out=remove-short-seq.out
+#SBATCH --err=remove-short-seq.err
+
+# ---------------------------------------------------------------------
+echo ""
+echo "Current working directory: `pwd`"
+echo "Starting run at: `date`"
+echo "SLURM_JOBID: " $SLURM_JOBID
+echo ""
+# ---------------------------------------------------------------------
+
+# --- Modules ---
+
+module load StdEnv/2020
+module load seqkit/2.3.1
+module load bioawk/1.0
+
+# ---------------
+
+cd ~/scratch/thimbleberry
+
+# remove short scaffolds
+
+seqkit seq -m 1000000 ./juicebox-outfiles/hap1-unaligned.fa > ./mummer-infiles/hap1.fasta
+seqkit seq -m 1000000 ./juicebox-outfiles/hap2-unaligned.fa > ./mummer-infiles/hap2.fasta
+seqkit seq -m 1000000 ./raspberry.fa > ./mummer-infiles/raspberry.fasta
+
+
+# rename scaffolds
+
+awk '/^>/ {printf("%s%s\t",(N>0?"\n":""),$0);N++;next;} {printf("%s",$0);} END {printf("\n");}'  ./mummer-infiles/hap1.fasta  |\
+awk -F '\t' '{printf("%d\t%s\n",length($2),$0);}' |\
+sort -k1,1nr | cut -f 2- | tr "\t" "\n" |\
+bioawk -c fastx '{ print ">hap1-" ++i "-" length($seq) "\n" $seq}'  > ./mummer-infiles/hap1-names.fasta
+
+awk '/^>/ {printf("%s%s\t",(N>0?"\n":""),$0);N++;next;} {printf("%s",$0);} END {printf("\n");}'  ./mummer-infiles/hap2.fasta  |\
+awk -F '\t' '{printf("%d\t%s\n",length($2),$0);}' |\
+sort -k1,1nr | cut -f 2- | tr "\t" "\n" |\
+bioawk -c fastx '{ print ">hap2-" ++i "-" length($seq) "\n" $seq}'  > ./mummer-infiles/hap2-names.fasta
+
+awk '/^>/ {printf("%s%s\t",(N>0?"\n":""),$0);N++;next;} {printf("%s",$0);} END {printf("\n");}'  ./mummer-infiles/raspberry.fasta  |\
+awk -F '\t' '{printf("%d\t%s\n",length($2),$0);}' |\
+sort -k1,1nr | cut -f 2- | tr "\t" "\n" |\
+bioawk -c fastx '{ print ">raspberry-" ++i "-" length($seq) "\n" $seq}'  > ./mummer-infiles/raspberry-names.fasta
+
+grep ">" ./mummer-infiles/*-names.fasta
+
+
+# ---------------------------------------------------------------------
+echo "Done prep for Mummer."
+echo "Finished job at `date`"
+# ---------------------------------------------------------------------
+```
+
+This script also renames the fasta entries for both haplotypes as well as for the raspberry sequences.
 
 ## Using Mummer
+
+Use Mummer to produce an alignment plot using the following script:
+
+```
+#!/bin/bash
+#SBATCH --account=def-mtodesco
+#SBATCH --time=00:50:00
+#SBATCH --mem=10G
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=10
+#SBATCH --out=mummer.out
+#SBATCH --err=mummer.err
+
+# ---------------------------------------------------------------------
+echo ""
+echo "Current working directory: `pwd`"
+echo "Starting run at: `date`"
+echo "SLURM_JOBID: " $SLURM_JOBID
+echo ""
+# ---------------------------------------------------------------------
+
+# --- Modules ---
+
+#module load StdEnv/2023
+#module load python/3.10.2 minimap2/2.24 scipy-stack/2022a gcc/9.3.0 r-bundle-bioconductor/3.12 mummer/4.0.0beta2 seqtk
+#module load seqkit
+
+module load StdEnv/2023
+module python minimap2 scipy-stack gcc r-bundle-bioconductor
+module load seqtk
+module load mummer
+
+
+# ---------------
+
+cd ~/scratch/thimbleberry
+
+# run mummer
+
+nucmer -t 40 -c 65 -l 20 -p ./mummer-outfiles/hap1 mummer-infiles/hap1.fasta  mummer-infiles/raspberry-names.fasta
+nucmer -t 40 -c 65 -l 20 -p ./mummer-outfiles/hap2 mummer-infiles/hap2.fasta  mummer-infiles/raspberry-names.fasta
+
+delta-filter -l 10000 -q -r ./mummer-outfiles/hap1.delta > ./mummer-outfiles/hap1-filter.delta
+delta-filter -l 10000 -q -r ./mummer-outfiles/hap2.delta > ./mummer-outfiles/hap2-filter.delta
+
+mummerplot ./mummer-outfiles/hap1-filter.delta -R ./mummer-infiles/hap1.fasta -Q ./mummer-infiles/raspberry-names.fasta --png -p ./mummer-outfiles/mum-plot-hap1
+mummerplot ./mummer-outfiles/hap2-filter.delta -R ./mummer-infiles/hap2.fasta -Q ./mummer-infiles/raspberry-names.fasta --png -p ./mummer-outfiles/mum-plot-hap2
+
+# ---------------------------------------------------------------------
+echo "Done Mummer."
+echo "Finished job at `date`"
+# ---------------------------------------------------------------------
+```
+
+Transfer this file to your local machine to view it. It may look something like this:
+
+
 
 ## Reordering chromosomes manually
 
