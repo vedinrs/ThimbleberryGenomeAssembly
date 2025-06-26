@@ -424,8 +424,69 @@ Once complete, create a directory called /juicebox-outfiles and save the result 
 Create a directory called /busco-outfiles. Throughout the pipeline, it is good to use BUSCO to analyze the quality of the assembly. To do so, use the following script:
 
 ```
+#!/bin/bash
+#SBATCH --account=def-mtodesco
+#SBATCH --time=1:00:00
+#SBATCH --mem=20G
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=10
+#SBATCH --out=busco.out
+#SBATCH --err=busco.err
 
+# ---------------------------------------------------------------------
+echo ""
+echo "Current working directory: `pwd`"
+echo "Starting run at: `date`"
+echo "SLURM_JOBID: " $SLURM_JOBID
+echo ""
+# ---------------------------------------------------------------------
+
+# --- Modules ---
+
+module load StdEnv/2020 gcc/9.3.0 python/3.10 augustus/3.5.0 hmmer/3.3.2 blast+/2.13.0 metaeuk/6 prodigal/2.6.3 r/4.3.1 bbmap/38.86
+
+# ---------------
+
+# --- Variables ---
+
+# -----------------
+
+cd ~/scratch/thimbleberry
+
+# set up busco
+
+#virtualenv ~/busco_env
+source ~/busco_env/bin/activate
+#pip install --no-index biopython==1.81 pandas==2.1.0 busco==5.5.0
+
+#pip freeze > ./busco-requirements.txt
+
+pip install --no-index --upgrade pip
+pip install --no-index --requirement ./busco-requirements.txt
+
+
+
+# download dataset
+
+#busco --download --download_path ~/datasets/ eudicots_odb10
+
+
+# run busco
+
+busco --offline \
+--in ~/scratch/thimbleberry/blackberry.fasta \
+--out busco-outfiles/blackberry.BUSCO_output \
+--lineage_dataset ~/datasets/eudicots_odb10 \
+--mode genome \
+--cpu ${SLURM_CPUS_PER_TASK:-1}
+
+
+# ---------------------------------------------------------------------
+echo "Done BUSCO."
+echo "Finished job at `date`"
+# ---------------------------------------------------------------------
 ```
+BUSCO analysis will also be useful if using another species for compiling annotations later on (which is what this workflow does).
 
 ## Reorder genome based on raspberry
 
