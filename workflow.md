@@ -615,7 +615,7 @@ echo "Finished job at `date`"
 
 Transfer this file to your local machine to view it. It may look something like this:
 
-![mummer-plot]([https://github.com/vedinrs/ThimbleberryGenomeAssembly/blob/main/mum-plot-hap1.png](https://github.com/vedinrs/ThimbleberryGenomeAssembly/blob/main/Images/mum-plot-hap1.png "Mummer Alignment Plot Example")
+![Mummer Alignment Plot Example]([https://github.com/vedinrs/ThimbleberryGenomeAssembly/blob/main/mum-plot-hap1.png](https://github.com/vedinrs/ThimbleberryGenomeAssembly/blob/main/Images/mum-plot-hap1.png)
 
 ## Reordering chromosomes manually
 
