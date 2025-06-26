@@ -598,14 +598,14 @@ cd ~/scratch/thimbleberry
 
 # run mummer
 
-nucmer -t 40 -c 65 -l 20 -p ./mummer-outfiles/hap1 mummer-infiles/hap1.fasta  mummer-infiles/raspberry-names.fasta
-nucmer -t 40 -c 65 -l 20 -p ./mummer-outfiles/hap2 mummer-infiles/hap2.fasta  mummer-infiles/raspberry-names.fasta
+nucmer -t 40 -c 65 -l 20 -p ./mummer-outfiles/hap1 trimmed/hap1-names.fasta  trimmed/blackberry-names.fasta
+nucmer -t 40 -c 65 -l 20 -p ./mummer-outfiles/hap2 trimmed/hap2-names.fasta  trimmed/blackberry-names.fasta
 
 delta-filter -l 10000 -q -r ./mummer-outfiles/hap1.delta > ./mummer-outfiles/hap1-filter.delta
 delta-filter -l 10000 -q -r ./mummer-outfiles/hap2.delta > ./mummer-outfiles/hap2-filter.delta
 
-mummerplot ./mummer-outfiles/hap1-filter.delta -R ./mummer-infiles/hap1.fasta -Q ./mummer-infiles/raspberry-names.fasta --png -p ./mummer-outfiles/mum-plot-hap1
-mummerplot ./mummer-outfiles/hap2-filter.delta -R ./mummer-infiles/hap2.fasta -Q ./mummer-infiles/raspberry-names.fasta --png -p ./mummer-outfiles/mum-plot-hap2
+mummerplot ./mummer-outfiles/hap1-filter.delta -R ./trimmed/hap1-names.fasta -Q ./trimmed/blackberry-names.fasta --png -p ./mummer-outfiles/mum-plot-hap1
+mummerplot ./mummer-outfiles/hap2-filter.delta -R ./trimmed/hap2-names.fasta -Q ./trimmed/blackberry-names.fasta --png -p ./mummer-outfiles/mum-plot-hap2
 
 # ---------------------------------------------------------------------
 echo "Done Mummer."
