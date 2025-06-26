@@ -622,6 +622,9 @@ Transfer this file to your local machine to view it. It may look something like 
 The following commands were used to manually reorder the chromosomes within the fasta file.
 
 ```
+module load bioawk/1.0
+bioawk -c fastx '{ print $name, length($seq) }' < Oxy_Sval_h1_short.fasta
+
 seqkit split -i -O reordered/ ./mummer-infiles/hap1-names.fasta
 
 seqkit seq -t DNA --reverse hap1-names.part_hap1-3-34435378.fasta > hap1-3-reverse.fasta
