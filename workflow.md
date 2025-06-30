@@ -490,7 +490,7 @@ BUSCO analysis will also be useful if using another species for compiling annota
 
 ## Reorder genome based on raspberry
 
-The next step is to align the chromosomes with the raspberry chromosomes to make annotation later on much easier. To start this process, we will complete some manual curation and use Mummer.
+The next step is to align the chromosomes with the raspberry chromosomes to make annotation later on much easier. To start this process, we will complete some manual curation and use Mummer. The raspberry sequence and annotation used was the [Malling Jewel](https://www.rosaceae.org/Analysis/16630508).
 
 ## Removing short sequences
 
