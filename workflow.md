@@ -630,14 +630,73 @@ seqkit split -i -O reordered/ ./mummer-infiles/hap1-names.fasta
 seqkit seq -t DNA --reverse hap1-names.part_hap1-3-34435378.fasta > hap1-3-reverse.fasta
 ```
 
-## Mask duplicated sequences using Red
+## Verify the order of the chromosomes using Mummer
 
-Using Red, mask duplicated sequences using the folliwing script:
+## Recompile the haplotypes
+
+The following command will be able to recover the filtered sequences that made it easier to use Mummer:
 
 ```
-
+seqkit seq -M 1000000 ./juicebox-outfiles/hap1-unaligned.fa > ./reordered/hap1-short-seq.fasta
 ```
 
-## Genome annotation with EDTA
+Then, use cat to make a final fasta file by appending the short sequences to the end of the reordered haplotype.
 
-To use EDTA, it is easiest to set up a Conda environment.
+
+## Genome annotation with Liftoff
+
+Use the following script to complete genome annotation with Liftoff:
+
+```
+#!/bin/bash
+#SBATCH --account=def-mtodesco
+#SBATCH --time=15:00:00
+#SBATCH --mem=30G
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=6
+#SBATCH --out=liftoff.out
+#SBATCH --err=liftoff.err
+
+# ---------------------------------------------------------------------
+echo ""
+echo "Current working directory: `pwd`"
+echo "Starting run at: `date`"
+echo "SLURM_JOBID: " $SLURM_JOBID
+echo ""
+# ---------------------------------------------------------------------
+
+# --- Modules ---
+
+module load gcc python/3.10 minimap2 parasail
+
+# ---------------
+
+# --- Variables ---
+
+# -----------------
+
+# set up liftoff
+
+source ~/env/bin/activate
+python -c "import liftoff; print(liftoff.__version__)"
+
+
+cd ~/scratch/thimbleberry
+
+
+# run liftoff
+
+liftoff -p 6 \
+-g ./blackberry.gff \
+-o ./liftoff-outfiles/hap1-annotations.gff3 \
+-u ./liftoff-outfiles/hap1-unmapped.txt \
+-dir ./liftoff-outfiles/intermediate \
+-a 0.95 -s 0.95 -d 5.0 -flank 0.8 \
+-copies \
+./reordered/hap1-complete.fasta ./blackberry.fasta
+
+# ---------------------------------------------------------------------
+echo "Done Liftoff."
+echo "Finished job at `date`"
+# ---------------------------------------------------------------------
+```
