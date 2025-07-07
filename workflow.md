@@ -488,6 +488,12 @@ echo "Finished job at `date`"
 ```
 BUSCO analysis will also be useful if using another species for compiling annotations later on (which is what this workflow does).
 
+## Checking comparisons between both haplotypes
+
+The next step is to cat the finished assemblies together and re-do an assembly to ultimately verify that there are no sequences misplaced between the two haplotypes. Use the cat command to join the finished .fasta files in a new directory labelled hap-both/. Repeat the entire assembly process.
+
+
+
 ## Reorder genome based on raspberry
 
 The next step is to align the chromosomes with the raspberry chromosomes to make annotation later on much easier. To start this process, we will complete some manual curation and use Mummer. The raspberry sequence and annotation used was the [Malling Jewel](https://www.rosaceae.org/Analysis/16630508).
