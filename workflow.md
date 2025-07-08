@@ -492,7 +492,14 @@ BUSCO analysis will also be useful if using another species for compiling annota
 
 The next step is to cat the finished assemblies together and re-do an assembly to ultimately verify that there are no sequences misplaced between the two haplotypes. Use the cat command to join the finished .fasta files in a new directory labelled hap-both/. Repeat the entire assembly process.
 
+### Renaming scaffolds and chromosomes
 
+Before re-assembling the joint haplotypes, make duplicate fasta files of the compelted assemblies and rename the scaffolds and chromosomes of the haplotypes so that there are not any duplicates. The following commands may be helpful:
+
+```
+sed -i -e 's/scaffold_/hap1_scaffold_/g' hap1-renamed.fasta
+sed -i -e 's/hap1-7-28753865/hap1_chr_7/' hap1-renamed.fasta
+```
 
 ## Reorder genome based on raspberry
 
