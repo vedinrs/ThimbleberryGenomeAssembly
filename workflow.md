@@ -490,7 +490,7 @@ BUSCO analysis will also be useful if using another species for compiling annota
 
 ## Checking comparisons between both haplotypes
 
-The next step is to cat the finished assemblies together and re-do an assembly to ultimately verify that there are no sequences misplaced between the two haplotypes. Use the cat command to join the finished .fasta files in a new directory labelled hap-both/. Repeat the entire assembly process.
+The next step is to cat the finished assemblies together and re-do an assembly to ultimately verify that there are no sequences misplaced between the two haplotypes. Use the cat command to join the finished .fasta files in a new directory labelled hap-both/. Repeat the entire assembly process with the following modifications listed below.
 
 ### Renaming scaffolds and chromosomes
 
@@ -499,6 +499,63 @@ Before re-assembling the joint haplotypes, make duplicate fasta files of the com
 ```
 sed -i -e 's/scaffold_/hap1_scaffold_/g' hap1-renamed.fasta
 sed -i -e 's/hap1-7-28753865/hap1_chr_7/' hap1-renamed.fasta
+```
+
+### Use 3d-dna instead of yahs
+
+Yahs is not as adept at scaffolding for diploid datasets. Instead, get clone 3d-dna and use the following script:
+
+```
+#!/bin/bash
+#SBATCH --account=def-mtodesco
+#SBATCH --time=10:00:00
+#SBATCH --mem=20G
+#SBATCH --cpus-per-task=15
+#SBATCH --output=hap-both/3DDNA.out
+#SBATCH --error=hap-both/3DDNA.err
+
+### 3D-DNA pipeline after getting Hi-C contact merge_nodups.txt file ###
+
+# ---------------------------------------------------------------------
+echo ""
+echo "Current working directory: `pwd`"
+echo "Starting run at: `date`"
+echo "SLURM_JOBID: " $SLURM_JOBID
+echo ""
+# ---------------------------------------------------------------------
+
+#####################################
+### Execution of programs ###########
+#####################################
+
+module load StdEnv/2020 python/3.11.2 java/17.0.2 lastz/1.04.03
+#virtualenv 3ddna_env
+#pip install scipy numpy matplotlib #libraries required for 3d-dna
+
+source 3ddna_env/bin/activate
+
+export PATH=$PATH:~/packages/3d-dna #3D de novo assembly: version 180114
+
+cd hap-both/3d-dna-outfiles/
+
+# --- Variables ---
+
+contig_fasta=~/thimbleberry/hap-both/references/*.fa
+merged_nodups=~/thimbleberry/hap-both/juicer/aligned/merged_nodups.txt
+
+# -----------------
+
+#run script; -r 0 runs only the first scaffolding, no polishing.
+run-asm-pipeline.sh -m diploid -r 0 $contig_fasta $merged_nodups
+
+
+deactivate
+
+# ---------------------------------------------------------------------
+echo ""
+echo "Done 3D-DNA pipeline scaffolding.  Use Juicebox to visualize and manually fix scaffolds."
+echo "Finished job at `date`"
+# ---------------------------------------------------------------------
 ```
 
 ## Reorder genome based on raspberry
